@@ -1,116 +1,91 @@
 @extends('layouts.app')
 
-@section('title','Cây gia phả')
+@section('title', 'Cây Gia Phả')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
-        <h2 class="text-3xl font-extrabold mb-6 text-gray-800 border-b pb-3 flex items-center">
-            🌳 Sơ đồ Cây Gia phả Tộc Võ
-        </h2>
+<div class="container py-4">
+    <h2 class="text-center mb-4">🌳 CÂY GIA PHẢ HỌ VÕ 🌳</h2>
 
-        {{-- Khung chứa cây và thiết lập font chữ --}}
-        <div id="tree-wrap" class="overflow-x-auto p-4 font-sans" style="min-height: 500px;">
-            <div class="tree-container">
-                <ul class="root-node">
-                    {{-- Giả định biến $tree được truyền vào và cấp độ bắt đầu là 1 --}}
-                    @foreach($tree as $node)
-                        @include('tree.partials.node', ['node' => $node, 'level' => 1])
-                    @endforeach
-                </ul>
-            </div>
-        </div>
+    <div class="tree text-center">
+        @foreach ($people as $person)
+            @if ($person->ParentID === null)
+                @include('tree.node', ['person' => $person])
+            @endif
+        @endforeach
     </div>
 </div>
-@endsection
 
-@push('styles')
 <style>
-/* CSS TÙY CHỈNH CHO SƠ ĐỒ CÂY */
-
-.tree-container ul {
-    list-style: none;
-    padding-left: 0;
+.tree ul {
+    padding-top: 20px;
     position: relative;
-    /* Thiết lập lại margin để sơ đồ gọn hơn */
+    transition: all 0.5s;
+    display: inline-block;
 }
 
-.tree-container ul ul {
-    padding-left: 30px; /* Thụt lề lớn hơn cho nhánh con */
-}
-
-.tree-container ul li {
+.tree li {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
     position: relative;
-    margin-bottom: 12px;
+    padding: 20px 5px 0 5px;
+    list-style-type: none;
 }
 
-/* Đường kẻ ngang: Nối từ Node cha sang Node con */
-.tree-container ul li:before {
+/* các đường nối giữa các node */
+.tree li::before, .tree li::after {
     content: '';
     position: absolute;
-    top: 24px; /* Căn giữa chiều cao thẻ mới (40px) */
-    left: 0;
-    border-top: 2px solid #D1D5DB; /* Màu xám nhạt */
-    width: 30px; /* Khoảng cách từ đường dọc đến thẻ con */
-    height: 0;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #ccc;
+    width: 50%;
+    height: 20px;
+}
+.tree li::after {
+    right: auto;
+    left: 50%;
+    border-left: 2px solid #ccc;
 }
 
-/* Đường kẻ dọc: Nối các Node ngang hàng (anh/chị/em) */
-.tree-container ul ul li:after {
-    content: '';
-    position: absolute;
-    left: -2px; /* Dịch sang trái để căn với đường ngang của cha */
-    top: -16px; /* Bắt đầu từ phía trên node hiện tại */
-    bottom: 0;
-    border-left: 2px solid #D1D5DB; /* Màu xám nhạt */
-    width: 0;
-}
-
-/* Điều chỉnh vị trí đường kẻ ngang cho Node cha (sau khi có đường kẻ dọc) */
-.tree-container ul ul li:before {
-    left: 0px;
-    width: 30px; /* Độ dài đường ngang */
-}
-
-/* Cắt đường dọc ở node cuối cùng của mỗi nhánh để không kéo dài xuống */
-.tree-container ul ul li:last-child:after {
-    height: 40px; /* Chiều cao cố định để dừng ở thẻ node hiện tại */
-}
-
-/* Ẩn đường kẻ cho node gốc */
-.tree-container .root-node > li:before,
-.tree-container .root-node > li:first-child:after {
+/* ẩn nhánh nối nếu là node gốc */
+.tree li:only-child::before, .tree li:only-child::after {
     display: none;
 }
+.tree li:only-child {
+    padding-top: 0;
+}
+.tree li:first-child::before, .tree li:last-child::after {
+    border: 0 none;
+}
+.tree li:last-child::before {
+    border-right: 2px solid #ccc;
+    border-radius: 0 5px 0 0;
+}
+.tree li:first-child::after {
+    border-radius: 5px 0 0 0;
+}
+
+/* khối hiển thị người */
+.tree .person {
+    display: inline-block;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    transition: all 0.3s;
+}
+.tree .person:hover {
+    background-color: #e9f5ff;
+    transform: scale(1.05);
+}
+.person .name {
+    font-weight: bold;
+    color: #0d6efd;
+}
+.person .gender {
+    font-size: 0.9em;
+    color: #666;
+}
 </style>
-@endpush
-
-@push('scripts')
-<script>
-    document.querySelectorAll('.toggle-children').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Tìm ul là phần tử con tiếp theo của li cha
-            const listItem = btn.closest('li');
-            if (!listItem) return;
-            
-            // Tìm UL chứa con (có thể là phần tử liền kề hoặc nằm trong cấu trúc phức tạp hơn)
-            // Trong cấu trúc mới, nó là phần tử UL tiếp theo
-            const childrenList = listItem.querySelector('ul'); 
-
-            if (childrenList) {
-                childrenList.classList.toggle('hidden');
-                
-                // Đổi biểu tượng
-                const icon = btn.querySelector('svg');
-                if (childrenList.classList.contains('hidden')) {
-                    // Dấu cộng (đóng)
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />'; 
-                } else {
-                    // Dấu trừ (mở)
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />'; 
-                }
-            }
-        });
-    });
-</script>
-@endpush
+@endsection

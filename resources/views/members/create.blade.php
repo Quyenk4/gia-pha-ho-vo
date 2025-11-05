@@ -1,107 +1,166 @@
 @extends('layouts.app')
 
-@section('title','Thêm thành viên mới')
+@section('title', 'Thêm Thành Viên Mới')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 py-10">
-    
-    <h1 class="text-4xl font-extrabold mb-8 text-gray-800 flex items-center border-b pb-3">
-        ➕ Thêm Thành viên mới vào Gia Phả
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-extrabold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 tracking-tight flex items-center justify-center animate-fadeIn">
+        <span class="mr-3 text-3xl transform rotate-6 inline-block">➕</span> Đăng Ký Thành Viên Mới
     </h1>
 
-    {{-- Form thêm mới với thiết kế Card nổi bật --}}
-    <form action="#" method="POST" enctype="multipart/form-data" 
-          class="bg-white p-8 rounded-2xl shadow-2xl space-y-7 border border-gray-100">
-        @csrf
-        
-        {{-- Phần I: Thông tin Cơ bản --}}
-        <div class="border-b pb-4">
-            <h2 class="text-2xl font-bold text-blue-600 mb-4">Thông tin Cơ bản</h2>
-            
-            <div class="space-y-4">
-                {{-- Họ và Tên --}}
-                <div>
-                    <label for="name" class="block font-semibold mb-1 text-gray-700">Họ và tên <span class="text-red-500">*</span></label>
-                    <input type="text" id="name" name="name" 
-                           class="w-full border-gray-300 rounded-xl px-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-150 shadow-sm" 
-                           placeholder="Nhập họ và tên đầy đủ">
-                </div>
+    <div class="bg-white p-8 rounded-3xl shadow-2xl border-t-4 border-indigo-500 transition duration-500 transform hover:shadow-3xl hover:-translate-y-0.5">
+        @if ($errors->any())
+            <div class="mb-6 p-4 bg-red-100 text-red-800 border-l-4 border-red-500 rounded-lg shadow-md animate-shake">
+                <p class="font-bold flex items-center">
+                    ⚠️ Lỗi nhập liệu! Vui lòng kiểm tra lại:
+                </p>
+                <ul class="list-disc list-inside mt-2 text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    {{-- Giới tính --}}
+        <form action="{{ route('members.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            @csrf
+
+            {{-- Họ tên & Giới tính --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="FullName" class="block font-semibold mb-1 text-gray-700">Họ và tên <span class="text-red-500">*</span></label>
+                    <input type="text" name="FullName" id="FullName" required value="{{ old('FullName') }}"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition">
+                </div>
+                <div>
+                    <label for="Gender" class="block font-semibold mb-1 text-gray-700">Giới tính</label>
+                    <select name="Gender" id="Gender" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-4 focus:ring-pink-200">
+                        <option value="">-- Chọn giới tính --</option>
+                        <option value="Nam" {{ old('Gender')=='Nam' ? 'selected' : '' }}>Nam</option>
+                        <option value="Nữ" {{ old('Gender')=='Nữ' ? 'selected' : '' }}>Nữ</option>
+                        <option value="Khác" {{ old('Gender')=='Khác' ? 'selected' : '' }}>Khác</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Ngày sinh & nơi sinh --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label for="DateOfBirth" class="block font-semibold mb-1 text-gray-700">Ngày sinh</label>
+                    <input type="date" name="DateOfBirth" id="DateOfBirth" value="{{ old('DateOfBirth') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                </div>
+                <div>
+                    <label for="DateOfDeath" class="block font-semibold mb-1 text-gray-700">Ngày mất</label>
+                    <input type="date" name="DateOfDeath" id="DateOfDeath" value="{{ old('DateOfDeath') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                </div>
+                <div>
+                    <label for="PlaceOfBirth" class="block font-semibold mb-1 text-gray-700">Nơi sinh</label>
+                    <input type="text" name="PlaceOfBirth" id="PlaceOfBirth" value="{{ old('PlaceOfBirth') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                </div>
+            </div>
+
+            {{-- Nghề nghiệp & Địa chỉ --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="Occupation" class="block font-semibold mb-1 text-gray-700">Nghề nghiệp</label>
+                    <input type="text" name="Occupation" id="Occupation" value="{{ old('Occupation') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                </div>
+                <div>
+                    <label for="CurrentAddress" class="block font-semibold mb-1 text-gray-700">Địa chỉ hiện tại</label>
+                    <input type="text" name="CurrentAddress" id="CurrentAddress" value="{{ old('CurrentAddress') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                </div>
+            </div>
+
+            {{-- Email & Điện thoại --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="Email" class="block font-semibold mb-1 text-gray-700">Email</label>
+                    <input type="email" name="Email" id="Email" value="{{ old('Email') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                </div>
+                <div>
+                    <label for="Phone" class="block font-semibold mb-1 text-gray-700">Số điện thoại</label>
+                    <input type="tel" name="Phone" id="Phone" value="{{ old('Phone') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                </div>
+            </div>
+
+            {{-- Thế hệ --}}
+            <div>
+                <label for="Generation" class="block font-semibold mb-1 text-gray-700">Thế hệ</label>
+                <input type="number" name="Generation" id="Generation" value="{{ old('Generation') }}" min="1" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+            </div>
+
+            {{-- Ảnh đại diện --}}
+            <div>
+                <label for="Avatar" class="block font-semibold mb-1 text-gray-700">Ảnh đại diện</label>
+                <input type="file" name="Avatar" id="Avatar" accept="image/*" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+            </div>
+
+            {{-- Tiểu sử --}}
+            <div>
+                <label for="Biography" class="block font-semibold mb-1 text-gray-700">Tiểu sử</label>
+                <textarea name="Biography" id="Biography" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">{{ old('Biography') }}</textarea>
+            </div>
+
+            {{-- Quan hệ Cha Mẹ --}}
+            <div class="border-t pt-6 mt-6 border-gray-200">
+                <h3 class="text-xl font-bold mb-4 text-indigo-600">Quan hệ Cha Mẹ</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="gender" class="block font-semibold mb-1 text-gray-700">Giới tính</label>
-                        <select id="gender" name="gender" 
-                                class="w-full border-gray-300 rounded-xl px-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-150 shadow-sm">
-                            <option value="Nam">👨 Nam</option>
-                            <option value="Nữ">👩 Nữ</option>
-                            <option value="Khác">🏳️‍⚧️ Khác</option>
+                        <label for="FatherID" class="block font-semibold mb-1 text-gray-700">Cha (nếu có)</label>
+                        <select name="FatherID" id="FatherID" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                            <option value="">-- Chọn Cha --</option>
+                            @foreach ($people as $p)
+                                <option value="{{ $p->PersonalID }}">{{ $p->FullName }}</option>
+                            @endforeach
                         </select>
                     </div>
-                    
-                    {{-- Ngày sinh --}}
-                    <div class="md:col-span-2">
-                        <label for="birthday" class="block font-semibold mb-1 text-gray-700">Ngày sinh</label>
-                        <input type="date" id="birthday" name="birthday" 
-                               class="w-full border-gray-300 rounded-xl px-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-150 shadow-sm">
+                    <div>
+                        <label for="MotherID" class="block font-semibold mb-1 text-gray-700">Mẹ (nếu có)</label>
+                        <select name="MotherID" id="MotherID" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                            <option value="">-- Chọn Mẹ --</option>
+                            @foreach ($people as $p)
+                                <option value="{{ $p->PersonalID }}">{{ $p->FullName }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
             </div>
-        </div>
 
-        {{-- Phần II: Thông tin Chi nhánh & Thế hệ --}}
-        <div class="border-b pb-4">
-            <h2 class="text-2xl font-bold text-teal-600 mb-4">Chi nhánh & Thế hệ</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {{-- Chi nhánh --}}
-                <div>
-                    <label for="branch" class="block font-semibold mb-1 text-gray-700">Chi nhánh/Khu vực</label>
-                    <input type="text" id="branch" name="branch" 
-                           class="w-full border-gray-300 rounded-xl px-4 py-2.5 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition duration-150 shadow-sm" 
-                           placeholder="Ví dụ: Chi III - Huế">
-                </div>
-                
-                {{-- Thế hệ --}}
-                <div>
-                    <label for="generation" class="block font-semibold mb-1 text-gray-700">Thế hệ (Số La Mã)</label>
-                    <input type="text" id="generation" name="generation" 
-                           class="w-full border-gray-300 rounded-xl px-4 py-2.5 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition duration-150 shadow-sm" 
-                           placeholder="Ví dụ: IX">
-                </div>
-
-                {{-- Nơi sinh --}}
-                <div>
-                    <label for="birthplace" class="block font-semibold mb-1 text-gray-700">Nơi sinh</label>
-                    <input type="text" id="birthplace" name="birthplace" 
-                           class="w-full border-gray-300 rounded-xl px-4 py-2.5 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition duration-150 shadow-sm" 
-                           placeholder="Tỉnh/Thành phố">
+            {{-- Quan hệ Hôn nhân --}}
+            <div class="border-t pt-6 mt-6 border-gray-200">
+                <h3 class="text-xl font-bold mb-4 text-indigo-600">Thông tin Hôn nhân</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="SpouseID" class="block font-semibold mb-1 text-gray-700">Vợ / Chồng (nếu có)</label>
+                        <select name="SpouseID" id="SpouseID" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                            <option value="">-- Chọn người kết hôn --</option>
+                            @foreach ($people as $p)
+                                <option value="{{ $p->PersonalID }}">{{ $p->FullName }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="MarriageDate" class="block font-semibold mb-1 text-gray-700">Ngày kết hôn</label>
+                        <input type="date" name="MarriageDate" id="MarriageDate" value="{{ old('MarriageDate') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                    </div>
+                    <div>
+                        <label for="MarriageStatus" class="block font-semibold mb-1 text-gray-700">Trạng thái</label>
+                        <select name="MarriageStatus" id="MarriageStatus" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+                            <option value="Đang sống cùng">Đang sống cùng</option>
+                            <option value="Đã ly hôn">Đã ly hôn</option>
+                            <option value="Mất vợ">Mất vợ</option>
+                            <option value="Mất chồng">Mất chồng</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        {{-- Phần III: Ảnh Đại diện --}}
-        <div>
-            <h2 class="text-2xl font-bold text-purple-600 mb-4">Ảnh Đại diện</h2>
-            <label for="photo" class="block font-semibold mb-1 text-gray-700">Tải lên ảnh thành viên</label>
-            <input type="file" id="photo" name="photo" 
-                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer">
-        </div>
 
-        {{-- Nút Hành động --}}
-        <div class="pt-6 border-t border-gray-100 flex justify-end space-x-4">
-            
-            <a href="{{ route('members.index') }}" 
-               class="px-6 py-2 text-gray-600 border border-gray-300 hover:bg-gray-100 rounded-xl transition font-medium flex items-center">
-                Hủy
-            </a>
-            
-            <button type="submit" 
-                    class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-xl shadow-lg transition duration-300 flex items-center">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Lưu Thành Viên
-            </button>
-        </div>
-    </form>
+            {{-- Nút --}}
+            <div class="flex justify-end pt-4 space-x-4">
+                <a href="{{ route('members.index') }}" class="px-6 py-2 rounded-full font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition">Hủy Bỏ</a>
+                <button type="submit" class="px-8 py-2 rounded-full font-extrabold text-white bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 shadow-lg">Thêm Thành Viên</button>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection
